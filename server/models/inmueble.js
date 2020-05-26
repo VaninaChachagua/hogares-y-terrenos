@@ -12,11 +12,15 @@ var inmuebleSchema = new Schema({
     // No sé si llamarlo identificador o nombre, es la forma en la que voy a presentarlos en la pagina
     identificador: {
         type: String,
-        required: [true, 'El identificador del inmueble es necesario']
+        required: [true, 'El nombre con el que quiere mostrar el inmueble es necesario']
     },
     precio: {
         type: Number,
-        required: false //[true, 'El precio del inmueble es necesario']
+        required: false //[true, 'El precio del inmueble es necesario'] agregar moneda
+    },
+    moneda: {
+        type: Number,
+        required: false //[true, 'El precio del inmueble es necesario'] agregar moneda
     },
     direccion: {
         type: String,
@@ -27,6 +31,10 @@ var inmuebleSchema = new Schema({
         required: [true, 'El barrio es necesario']
     },
     descripcion: {
+        type: String,
+        required: false
+    },
+    cantHab: {
         type: String,
         required: false
     },

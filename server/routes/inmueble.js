@@ -3,15 +3,10 @@ const { verificaToken } = require('../middleware/autentication');
 
 let app = express();
 let Inmueble = require('../models/inmueble');
-// trae un listado de inmuebles 
-// app.get('/inmueble', verificaToken, (req, res) => {
-app.get('/inmueble', (req, res) => {
-    let desde = req.query.desde || 0;
-    desde = Number(desde);
 
+// Arreglar, debería traer un listado de inmuebles 
+app.get('/inmueble', verificaToken, (req, res) => {
     Inmueble.find({ disponible: true })
-        .skip(desde)
-        .limit(5)
         .populate('usuario', 'nombre email')
         .exec((err, inmuebles) => {
             if (err) {
@@ -28,8 +23,9 @@ app.get('/inmueble', (req, res) => {
 
 });
 
-app.get('/inmueble/:id', (req, res) => {
-    // app.get('/inmueble/:id', verificaToken, (req, res) => {
+
+// trae uno en específico
+app.get('/inmueble/:id', verificaToken, (req, res) => {
     let id = req.params.id;
 
     Inmueble.findById(id)
@@ -55,12 +51,12 @@ app.get('/inmueble/:id', (req, res) => {
 
 });
 
-// app.get('/inmueble/buscar/:termino', verificaToken, (req, res) => {
-app.get('/inmueble/buscar/:termino', (req, res) => {
+//Validar, es una busqueda por el identificador o nombre
+app.get('/inmueble/buscar/:termino', verificaToken, (req, res) => {
     let termino = req.params.termino;
     //expresion regular
     let regex = new RegExp(termino, 'i');
-    Inmueble.find({ nombre: regex })
+    Inmueble.find({ identificador: regex })
         .exec((err, inmuebles) => {
             if (err) {
                 return res.status(400).json({
@@ -76,16 +72,17 @@ app.get('/inmueble/buscar/:termino', (req, res) => {
 });
 
 //Crear inmueble
-// app.post('/inmueble', verificaToken, (req, res) => {
-app.post('/inmueble', (req, res) => {
+app.post('/inmueble', verificaToken, (req, res) => {
+
     let body = req.body;
     let inmueble = new Inmueble({
         identificador: body.identificador,
         precio: body.precio,
+        moneda: body.moneda,
         direccion: body.direccion,
         barrio: body.barrio,
         descripcion: body.descripcion,
-        img: body.img,
+        cantHab: body.cantHab,
         disponible: body.disponible,
         tipoInmueble: body.tipoInmueble,
         tipoVenta: body.tipoVenta,
@@ -106,8 +103,7 @@ app.post('/inmueble', (req, res) => {
 });
 
 //Actualizar inmueble
-// app.put('/inmueble/:id', verificaToken, (req, res) => {
-app.put('/inmueble/:id', (req, res) => {
+app.put('/inmueble/:id', verificaToken, (req, res) => {
     let body = req.body;
     let id = req.params.id;
 
@@ -126,10 +122,11 @@ app.put('/inmueble/:id', (req, res) => {
         }
         inmuebleBD.identificador = body.identificador;
         inmuebleBD.precio = body.precio;
+        inmuebleBD.moneda = body.moneda;
         inmuebleBD.direccion = body.direccion;
         inmuebleBD.barrio = body.barrio;
         inmuebleBD.descripcion = body.descripcion;
-        inmuebleBD.img = body.img;
+        inmuebleBD.cantHab = body.cantHab;
         inmuebleBD.tipoInmueble = body.tipoInmueble;
         inmuebleBD.tipoVenta = body.tipoVenta;
         inmuebleBD.usuario = req.usuario._id;
@@ -153,8 +150,8 @@ app.put('/inmueble/:id', (req, res) => {
 
 
 //Borrar inmueble, disponible a falso
-// app.delete('/inmueble/:id',verificaToken, (req, res) => {
-app.delete('/inmueble/:id', (req, res) => {
+app.delete('/inmueble/:id', verificaToken, (req, res) => {
+
     let id = req.params.id;
 
 

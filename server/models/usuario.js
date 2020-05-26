@@ -49,11 +49,11 @@ let usuarioSchema = new Schema({
     estado: {
         type: Boolean,
         default: true
-    },
-    google: {
-        type: Boolean,
-        default: false
-    }
+    } //,
+    // google: {
+    //     type: Boolean,
+    //     default: false
+    // } Sirve si quiero armar el logueo con cuenta de google
 });
 
 usuarioSchema.methods.toJSON = function() {

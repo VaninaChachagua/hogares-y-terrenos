@@ -28,8 +28,8 @@ let verificaToken = (req, res, next) => {
 //next continua con la ejecución del programa
 let verificaAdminRole = (req, res, next) => {
 
-    let usuario = req.usuario;
-
+    let usuario = req.usuario.role;
+    console.log(usuario);
     if (usuario === 'ADMIN_ROLE') {
         next();
 
