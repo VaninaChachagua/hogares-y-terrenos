@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
 const Usuario = require('../models/usuario');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 
 
-const { verificaToken, verificaAdminRole } = require('../middleware/autentication');
+const { verificaToken, verificaMail, verificaAdminRole } = require('../middleware/autentication');
 
 app.get('/usuario', verificaToken, (req, res) => {
     Usuario.find({ estado: true }, 'nombre apellido email telefono1 telalternativo role estado google img') //Lo que yo quiero que busque
@@ -26,8 +26,54 @@ app.get('/usuario', verificaToken, (req, res) => {
         });
 });
 
+// app.get('/usuario/:id', verificaToken, (req, res) => {
+//     let mail = req.params.mail;
 
-app.post('/usuario', [verificaToken, verificaAdminRole], (req, res) => {
+//     Usuario.findById(mail)
+//         .exec((err, usuario) => {
+//             if (err) {
+//                 return res.status(400).json({
+//                     ok: false,
+//                     err
+//                 });
+//             }
+//             if (!usuario) {
+//                 return res.status(500).json({
+//                     ok: false,
+//                     message: 'No se encontró ese id usuario'
+//                 });
+//             }
+
+//             res.json({
+//                 ok: true,
+//                 inmueble
+//             });
+//         });
+// });
+
+app.get('/usuario/:email', verificaToken, (req, res) => {
+    let mail = req.params.mail;
+
+    let regex = new RegExp(mail, 'i');
+
+    Usuario.findOne({ email: regex })
+        .exec((err, usuarios) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                usuarios
+            });
+        });
+});
+
+// app.post('/usuario', [verificaToken, verificaMail, verificaAdminRole], (req, res) => {
+app.post('/usuario', [verificaMail], (req, res) => {
     // Busco los datos que se quieren utilizar para crear el usuario
     let body = req.body;
 
@@ -48,6 +94,7 @@ app.post('/usuario', [verificaToken, verificaAdminRole], (req, res) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
+                message: 'Error al intentar impactar en la base',
                 err
             });
 

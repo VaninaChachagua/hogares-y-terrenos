@@ -16,11 +16,13 @@ var inmuebleSchema = new Schema({
     },
     precio: {
         type: Number,
-        required: false //[true, 'El precio del inmueble es necesario'] agregar moneda
+        required: true, //[true, 'El precio del inmueble es necesario'] agregar moneda
+        default: 0
     },
     moneda: {
-        type: Number,
-        required: false //[true, 'El precio del inmueble es necesario'] agregar moneda
+        type: String,
+        required: false, //[true, 'El precio del inmueble es necesario'] agregar moneda
+        default: 'ars'
     },
     direccion: {
         type: String,
@@ -61,6 +63,10 @@ var inmuebleSchema = new Schema({
     usuario: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario'
+    },
+    visitas: {
+        type: Number,
+        required: true
     }
 });
 

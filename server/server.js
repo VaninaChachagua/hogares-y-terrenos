@@ -4,15 +4,27 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
+const corss = require('cors');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// Le digo a mi front, que es seguro
+app.use(corss());
+
 // parse application/json ... 
 app.use(bodyParser.json());
 
+app.all('/', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
+
 //habilitar la carpeta public
 app.use(express.static(path.resolve(__dirname, '../public')));
+//habilitar la carpeta public
+app.use(express.static(path.resolve(__dirname, '../uploads/inmuebles')));
 
 //Configuración de rutas
 app.use(require('./routes/index'));

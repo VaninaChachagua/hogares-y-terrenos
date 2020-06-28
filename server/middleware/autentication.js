@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const Usuario = require('../models/usuario');
 
 //******************************
 //      Verificar token
@@ -42,6 +42,36 @@ let verificaAdminRole = (req, res, next) => {
         });
     }
 };
+//******************************
+//      Verificar Mail
+//******************************
+//next continua con la ejecución del programa
+let verificaMail = (req, res, next) => {
+
+    let mail = req.params.mail;
+
+    let regex = new RegExp(mail, 'i');
+
+    Usuario.findOne({ email: regex })
+        .exec((err, usuarios) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            if (Object.keys(usuarios).length != 0) {
+                res.status(400).json({
+                    ok: false,
+                    message: 'Ese mail ya existe'
+                });
+            }
+
+
+        });
+};
+
 
 //*****************************************
 //      Verificar token para Imagen
@@ -68,5 +98,6 @@ let verificaTokenImg = (req, res, next) => {
 module.exports = {
     verificaToken,
     verificaAdminRole,
+    verificaMail,
     verificaTokenImg
 };

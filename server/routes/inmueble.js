@@ -5,7 +5,7 @@ let app = express();
 let Inmueble = require('../models/inmueble');
 
 // Arreglar, debería traer un listado de inmuebles 
-app.get('/inmueble', verificaToken, (req, res) => {
+app.get('/inmueble', (req, res) => {
     Inmueble.find({ disponible: true })
         .populate('usuario', 'nombre email')
         .exec((err, inmuebles) => {
@@ -25,7 +25,7 @@ app.get('/inmueble', verificaToken, (req, res) => {
 
 
 // trae uno en específico
-app.get('/inmueble/:id', verificaToken, (req, res) => {
+app.get('/inmueble/:id', (req, res) => {
     let id = req.params.id;
 
     Inmueble.findById(id)
@@ -52,7 +52,7 @@ app.get('/inmueble/:id', verificaToken, (req, res) => {
 });
 
 //Validar, es una busqueda por el identificador o nombre
-app.get('/inmueble/buscar/:termino', verificaToken, (req, res) => {
+app.get('/inmueble/buscar/:termino', (req, res) => {
     let termino = req.params.termino;
     //expresion regular
     let regex = new RegExp(termino, 'i');
@@ -71,8 +71,10 @@ app.get('/inmueble/buscar/:termino', verificaToken, (req, res) => {
         });
 });
 
+
+
 //Crear inmueble
-app.post('/inmueble', verificaToken, (req, res) => {
+app.post('/inmueble', (req, res) => {
 
     let body = req.body;
     let inmueble = new Inmueble({
@@ -86,7 +88,8 @@ app.post('/inmueble', verificaToken, (req, res) => {
         disponible: body.disponible,
         tipoInmueble: body.tipoInmueble,
         tipoVenta: body.tipoVenta,
-        usuario: req.usuario._id
+        usuario: body.usuario,
+        visitas: 0
     });
     inmueble.save((err, inmuebleBD) => {
         if (err) {
@@ -130,8 +133,9 @@ app.put('/inmueble/:id', verificaToken, (req, res) => {
         inmuebleBD.tipoInmueble = body.tipoInmueble;
         inmuebleBD.tipoVenta = body.tipoVenta;
         inmuebleBD.usuario = req.usuario._id;
+        inmuebleBD.visitas = body.visitas;
 
-        inmuebleBD.save((error, prodGuardado) => {
+        inmuebleBD.save((error, inmuebleGuardado) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -140,7 +144,7 @@ app.put('/inmueble/:id', verificaToken, (req, res) => {
             }
             res.json({
                 ok: true,
-                inmueble: inmuebleBD
+                inmueble: inmuebleGuardado
             });
         });
 
@@ -148,6 +152,41 @@ app.put('/inmueble/:id', verificaToken, (req, res) => {
 });
 
 
+//Actualizar inmueble
+app.put('/inmueble/visitas/:id', (req, res) => {
+    let body = req.body;
+    let id = req.params.id;
+
+    Inmueble.findById(id, (err, inmuebleBD) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+        if (!inmuebleBD) {
+            return res.status(400).json({
+                ok: false,
+                message: 'No se encontró ese id inmueble'
+            });
+        }
+        inmuebleBD.visitas = body.visitas;
+
+        inmuebleBD.save((error, inmuebleGuardado) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+            res.json({
+                ok: true,
+                inmueble: inmuebleGuardado
+            });
+        });
+
+    });
+});
 
 //Borrar inmueble, disponible a falso
 app.delete('/inmueble/:id', verificaToken, (req, res) => {
