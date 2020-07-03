@@ -24,12 +24,12 @@ app.get('/inmueble', (req, res) => {
 });
 
 
-// trae uno en específico
+// Trae uno en específico
 app.get('/inmueble/:id', (req, res) => {
     let id = req.params.id;
 
     Inmueble.findById(id)
-        .populate('usuario', 'nombre email')
+        .populate('usuario', 'nombre email telefono1')
         .exec((err, inmueble) => {
             if (err) {
                 return res.status(400).json({
@@ -89,7 +89,8 @@ app.post('/inmueble', (req, res) => {
         tipoInmueble: body.tipoInmueble,
         tipoVenta: body.tipoVenta,
         usuario: body.usuario,
-        visitas: 0
+        visitas: 0,
+        fechaAlta: new Date()
     });
     inmueble.save((err, inmuebleBD) => {
         if (err) {
@@ -134,12 +135,13 @@ app.put('/inmueble/:id', verificaToken, (req, res) => {
         inmuebleBD.tipoVenta = body.tipoVenta;
         inmuebleBD.usuario = req.usuario._id;
         inmuebleBD.visitas = body.visitas;
+        inmuebleBD.fechaAlta = new Date();
 
         inmuebleBD.save((error, inmuebleGuardado) => {
-            if (err) {
+            if (error) {
                 return res.status(500).json({
                     ok: false,
-                    err
+                    error
                 });
             }
             res.json({
@@ -152,9 +154,8 @@ app.put('/inmueble/:id', verificaToken, (req, res) => {
 });
 
 
-//Actualizar inmueble
+//Actualizar visitas inmueble
 app.put('/inmueble/visitas/:id', (req, res) => {
-    let body = req.body;
     let id = req.params.id;
 
     Inmueble.findById(id, (err, inmuebleBD) => {
@@ -170,13 +171,13 @@ app.put('/inmueble/visitas/:id', (req, res) => {
                 message: 'No se encontró ese id inmueble'
             });
         }
-        inmuebleBD.visitas = body.visitas;
+        inmuebleBD.visitas += 1;
 
         inmuebleBD.save((error, inmuebleGuardado) => {
-            if (err) {
+            if (error) {
                 return res.status(500).json({
                     ok: false,
-                    err
+                    error
                 });
             }
             res.json({

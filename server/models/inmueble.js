@@ -67,6 +67,10 @@ var inmuebleSchema = new Schema({
     visitas: {
         type: Number,
         required: true
+    },
+    fechaAlta: {
+        type: Date,
+        required: true
     }
 });
 
