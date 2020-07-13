@@ -41,7 +41,11 @@ var inmuebleSchema = new Schema({
         required: false
     },
     img: {
-        type: String,
+        type: Array,
+        required: false
+    },
+    archivos: {
+        type: Array,
         required: false
     },
     disponible: {
