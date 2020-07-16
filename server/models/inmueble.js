@@ -42,7 +42,8 @@ var inmuebleSchema = new Schema({
     },
     img: {
         type: Array,
-        required: false
+        required: false,
+        default: ['vacio.png']
     },
     archivos: {
         type: Array,

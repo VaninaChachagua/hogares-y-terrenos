@@ -83,7 +83,7 @@ app.put('/upload/:tipo/:id', (req, res) => {
 
 
 });
-app.put('/uploadarchivos/:id', (req, res) => {
+app.put('/uploadarchivos/:tipo/:id', (req, res) => {
     console.log(req.body);
     let id = req.params.id;
     console.log(id);
@@ -115,7 +115,7 @@ app.put('/uploadarchivos/:id', (req, res) => {
         });
     }
     //Cambiar el nombre de archivo, único
-    let nombreArchivo = `${id}-${ new Date().getMilliseconds()}.${extension}`;
+    let nombreArchivo = `${id}-${ new Date().getTime()}.${extension}`;
 
     archivo.mv(`./uploads/archivos/${nombreArchivo}`, (err) => {
         if (err) {

@@ -46,6 +46,25 @@ app.post('/login', (req, res) => {
     });
 
 });
+app.get('/obtenerRolePorToken/:tk', (req, res) => {
+    const tk = req.params.tk;
+    jwt.verify(tk, process.env.SEED, (err, decoded) => {
+        if (err) {
+            res.status(401).json({
+                ok: false,
+                err: {
+                    message: 'Token no válido'
+                }
+            });
+        } else {
+            res.status(200).json({
+                ok: true,
+                message: 'Token OK',
+                role: decoded.usuario.role
+            });
+        }
+    });
+});
 
 
 module.exports = app;
