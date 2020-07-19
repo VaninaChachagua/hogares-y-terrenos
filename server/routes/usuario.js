@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const Usuario = require('../models/usuario');
+const Inmueble = require('../models/inmueble');
 const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 
@@ -86,23 +87,39 @@ app.post('/usuario', [verificaMail], (req, res) => {
         telalternativo: body.telalternativo,
         password: bcrypt.hashSync(body.password, 10),
         img: body.img,
-        role: body.role
+        role: body.role,
+        // inmmueble: body.inmmueble.push
     });
     console.log(usuario);
-    usuario.save((err, usuarioBD) => {
-        // En caso de error
+    Inmueble.findById(id, (err, inmuebleBD) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(500).json({
                 ok: false,
-                message: 'Error al intentar impactar en la base',
                 err
             });
-
+        }
+        if (!inmuebleBD) {
+            return res.status(400).json({
+                ok: false,
+                message: 'No se encontró ese id inmueble'
+            });
         }
 
-        res.json({
-            ok: true,
-            usuario: usuarioBD
+        usuario.save((err, usuarioBD) => {
+            // En caso de error
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    message: 'Error al intentar impactar en la base',
+                    err
+                });
+
+            }
+
+            res.json({
+                ok: true,
+                usuario: usuarioBD
+            });
         });
     });
 
