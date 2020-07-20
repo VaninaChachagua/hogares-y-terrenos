@@ -72,6 +72,30 @@ app.get('/usuario/:email', verificaToken, (req, res) => {
             });
         });
 });
+app.get('/usuarioid/:id', verificaToken, (req, res) => {
+    let id = req.params.id;
+    Usuario.findById(id)
+        // .populate('inmueble', 'identificador')
+        .exec((err, usuarioBD) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+            if (!inmueble) {
+                return res.status(500).json({
+                    ok: false,
+                    message: 'No se encontró ese id usuario'
+                });
+            }
+            res.json({
+                ok: true,
+                usuarioBD
+            });
+        });
+
+});
 
 // app.post('/usuario', [verificaToken, verificaMail, verificaAdminRole], (req, res) => {
 app.post('/usuario', [verificaMail], (req, res) => {

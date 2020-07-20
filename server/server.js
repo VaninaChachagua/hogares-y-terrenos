@@ -25,6 +25,7 @@ app.all('/', function(req, res, next) {
 app.use(express.static(path.resolve(__dirname, '../public')));
 //habilitar la carpeta public
 app.use(express.static(path.resolve(__dirname, '../uploads/inmuebles')));
+app.use(express.static(path.resolve(__dirname, '../uploads/archivos')));
 
 //Configuración de rutas
 app.use(require('./routes/index'));

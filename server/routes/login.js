@@ -48,7 +48,7 @@ app.post('/login', (req, res) => {
 });
 
 // Obtener id también
-app.get('/obtenerRolePorToken/:tk', (req, res) => {
+app.get('/obtenerInfoPorTk/:tk', (req, res) => {
     const tk = req.params.tk;
     jwt.verify(tk, process.env.SEED, (err, decoded) => {
         if (err) {
@@ -61,8 +61,8 @@ app.get('/obtenerRolePorToken/:tk', (req, res) => {
         } else {
             res.status(200).json({
                 ok: true,
-                message: 'Token OK',
-                role: decoded.usuario.role
+                dec: decoded.usuario,
+                message: 'Token OK'
             });
         }
     });
