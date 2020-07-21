@@ -7,9 +7,10 @@ const _ = require('underscore');
 
 
 const { verificaToken, verificaMail, verificaAdminRole } = require('../middleware/autentication');
+const inmueble = require('../models/inmueble');
 
 app.get('/usuario', verificaToken, (req, res) => {
-    Usuario.find({ estado: true }, 'nombre apellido email telefono1 telalternativo role estado google img') //Lo que yo quiero que busque
+    Usuario.find({ estado: true }, 'nombre apellido email telefono1 telalternativo role estado img') //Lo que yo quiero que busque
         .exec((err, usuarios) => {
             if (err) {
                 return res.status(400).json({
@@ -72,7 +73,7 @@ app.get('/usuario/:email', verificaToken, (req, res) => {
             });
         });
 });
-app.get('/usuarioid/:id', verificaToken, (req, res) => {
+app.get('/usuarioid/:id', (req, res) => {
     let id = req.params.id;
     Usuario.findById(id)
         // .populate('inmueble', 'identificador')
@@ -111,10 +112,46 @@ app.post('/usuario', [verificaMail], (req, res) => {
         telalternativo: body.telalternativo,
         password: bcrypt.hashSync(body.password, 10),
         img: body.img,
-        role: body.role,
-        // inmmueble: body.inmmueble.push
+        role: body.role
     });
-    console.log(usuario);
+    usuario.save((err, usuarioBD) => {
+        // En caso de error
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                message: 'Error al intentar impactar en la base',
+                err
+            });
+        }
+        res.json({
+            ok: true,
+            usuario: usuarioBD
+        });
+    });
+});
+
+function buscarInmuebles(listId) {
+    listId.forEach(id => {
+        Inmueble.findById(id, (err, inmuebleBD) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+            if (!inmuebleBD) {
+                // Recordar borrar del array si no existe
+            }
+            // Ver si sigue solo
+            // else {
+            //     next();
+            // }
+
+        });
+    });
+}
+
+function buscarInmueble(id) {
     Inmueble.findById(id, (err, inmuebleBD) => {
         if (err) {
             return res.status(500).json({
@@ -125,29 +162,12 @@ app.post('/usuario', [verificaMail], (req, res) => {
         if (!inmuebleBD) {
             return res.status(400).json({
                 ok: false,
-                message: 'No se encontró ese id inmueble'
+                message: 'Ese inmueble no existe',
+                err
             });
         }
-
-        usuario.save((err, usuarioBD) => {
-            // En caso de error
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    message: 'Error al intentar impactar en la base',
-                    err
-                });
-
-            }
-
-            res.json({
-                ok: true,
-                usuario: usuarioBD
-            });
-        });
     });
-
-});
+}
 
 app.put('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
     let id = req.params.id;

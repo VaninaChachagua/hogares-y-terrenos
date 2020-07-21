@@ -52,7 +52,7 @@ let verificaMail = (req, res, next) => {
 
     let regex = new RegExp(mail, 'i');
 
-    Usuario.findOne({ email: regex })
+    Usuario.findOne({ email: mail })
         .exec((err, usuarios) => {
             if (err) {
                 return res.status(400).json({
@@ -60,16 +60,38 @@ let verificaMail = (req, res, next) => {
                     err
                 });
             }
-
-            if (Object.keys(usuarios).length != 0) {
+            console.log(usuarios);
+            if (usuarios) {
                 res.status(400).json({
                     ok: false,
                     message: 'Ese mail ya existe'
                 });
+            } else {
+                next();
             }
 
-
         });
+
+    // Usuario.findOne(mail)
+    //     // .populate('inmueble', 'identificador')
+    //     .exec((err, usuarioBD) => {
+    //         if (err) {
+    //             return res.status(400).json({
+    //                 ok: false,
+    //                 err
+    //             });
+    //         }
+    //         if (!inmueble) {
+    //             return res.status(500).json({
+    //                 ok: false,
+    //                 message: 'No se encontró ese id usuario'
+    //             });
+    //         }
+    //         res.json({
+    //             ok: true,
+    //             usuarioBD
+    //         });
+    //     });
 };
 
 
