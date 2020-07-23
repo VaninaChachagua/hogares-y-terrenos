@@ -47,7 +47,8 @@ var inmuebleSchema = new Schema({
     },
     archivos: {
         type: Object,
-        required: false
+        required: false,
+        default: ''
     },
     disponible: {
         type: Boolean,

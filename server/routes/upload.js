@@ -110,6 +110,54 @@ app.put('/uploadarchivos/:tipo/:id', (req, res) => {
 
 });
 
+// Actualizar archivos/imágenes inmueble
+app.put('/upload/borrarArchivos/:id/:tipo/:nombreArchivo', (req, res) => {
+    const idInmueble = req.params.id;
+    const tipoArchivo = req.params.tipo;
+    let tipo;
+    const nombreArchivo = req.params.nombreArchivo;
+
+    Inmueble.findById(idInmueble, (err, inmuebleBD) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+        if (!inmuebleBD) {
+            return res.status(400).json({
+                ok: false,
+                message: 'No se encontró ese id inmueble'
+            });
+        }
+
+        if (tipoArchivo === 'img') {
+            inmuebleBD.img = inmuebleBD.img.filter(a => a !== nombreArchivo);
+            tipo = 'inmuebles';
+            inmuebleBD.markModified('img');
+        } else {
+            inmuebleBD.archivos[tipoArchivo] = inmuebleBD.archivos[tipoArchivo].filter(a => a !== nombreArchivo);
+            tipo = 'archivos';
+            inmuebleBD.markModified('archivos');
+        }
+
+        inmuebleBD.save((error, inmuebleGuardado) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    error
+                });
+            }
+            res.json({
+                ok: true,
+                inmueble: inmuebleGuardado
+            });
+            borraunArchivo(nombreArchivo, tipo);
+        });
+
+    });
+});
+
 function archivosList(archivos, tipo, id, res) {
     const nombres = [];
     let cant = 0;
@@ -313,6 +361,15 @@ function borraArchivo(nombreImgagenes, tipo) {
 
 }
 
+function borraunArchivo(nombreImg, tipo) {
+    //Validar ruta
+    let pathImg = path.resolve(__dirname, `../../uploads/${tipo}/${nombreImg}`);
+    //Validar si el path existe y borrarlo
+    if (fs.existsSync(pathImg)) {
+        fs.unlinkSync(pathImg);
+    }
+}
+
 function imagenInmueble(id, res, nombresArchivos) {
 
     Inmueble.findById(id, (err, inmuebleBD) => {
@@ -342,7 +399,7 @@ function imagenInmueble(id, res, nombresArchivos) {
         nombresArchivos.forEach(nombreArchivo => {
             inmuebleBD.img.push(nombreArchivo);
         });
-
+        inmuebleBD.markModified('img');
         inmuebleBD.save((err, inmuebleGuardado) => {
             res.json({
                 ok: true,

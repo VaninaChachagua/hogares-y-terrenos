@@ -134,7 +134,6 @@ app.put('/inmueble/:id', verificaToken, (req, res) => {
         inmuebleBD.tipoInmueble = body.tipoInmueble;
         inmuebleBD.tipoVenta = body.tipoVenta;
         inmuebleBD.usuario = req.usuario._id;
-        inmuebleBD.visitas = body.visitas;
         inmuebleBD.fechaAlta = new Date();
 
         inmuebleBD.save((error, inmuebleGuardado) => {
@@ -189,6 +188,7 @@ app.put('/inmueble/visitas/:id', (req, res) => {
     });
 });
 
+
 //Borrar inmueble, disponible a falso
 app.delete('/inmueble/:id', verificaToken, (req, res) => {
 
@@ -224,7 +224,6 @@ app.delete('/inmueble/:id', verificaToken, (req, res) => {
                 mensaje: 'Inmueble Borrado'
             });
         });
-
     });
 });
 

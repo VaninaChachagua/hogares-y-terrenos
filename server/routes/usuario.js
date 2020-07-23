@@ -28,30 +28,6 @@ app.get('/usuario', verificaToken, (req, res) => {
         });
 });
 
-// app.get('/usuario/:id', verificaToken, (req, res) => {
-//     let mail = req.params.mail;
-
-//     Usuario.findById(mail)
-//         .exec((err, usuario) => {
-//             if (err) {
-//                 return res.status(400).json({
-//                     ok: false,
-//                     err
-//                 });
-//             }
-//             if (!usuario) {
-//                 return res.status(500).json({
-//                     ok: false,
-//                     message: 'No se encontró ese id usuario'
-//                 });
-//             }
-
-//             res.json({
-//                 ok: true,
-//                 inmueble
-//             });
-//         });
-// });
 
 app.get('/usuario/:email', verificaToken, (req, res) => {
     let mail = req.params.mail;
@@ -98,6 +74,48 @@ app.get('/usuarioid/:id', (req, res) => {
 
 });
 
+
+app.put('/usuarioInmueble/:id', [verificaToken, verificaAdminRole], (req, res) => {
+    let id = req.params.id;
+    // let body = _.pick(req.body, ['nombre', 'apellido', 'img', 'role', 'estado', 'telefono1', 'telalternativo']);
+    let inmueble = req.body;
+    if (!inmueble.length) {
+        buscarInmueble(inmueble);
+    } else {
+        let valor = buscarInmuebles(inmueble);
+        if (!valor) {
+            return res.status(404).json({
+                ok: false,
+                message: 'No se encontró el inmueble seleccionado',
+                error
+            });
+        }
+    }
+
+    Usuario.findById(id, (err, usuarioBD) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+        console.log(err);
+        usuarioBD.save((error, inmuebleGuardado) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    error
+                });
+            }
+            res.json({
+                ok: true,
+                usuario: usuarioBD
+            });
+        });
+
+
+    });
+});
 // app.post('/usuario', [verificaToken, verificaMail, verificaAdminRole], (req, res) => {
 app.post('/usuario', [verificaMail], (req, res) => {
     // Busco los datos que se quieren utilizar para crear el usuario
@@ -130,8 +148,10 @@ app.post('/usuario', [verificaMail], (req, res) => {
     });
 });
 
+
+
 function buscarInmuebles(listId) {
-    listId.forEach(id => {
+    listId.forEach((id, index) => {
         Inmueble.findById(id, (err, inmuebleBD) => {
             if (err) {
                 return res.status(500).json({
@@ -139,8 +159,12 @@ function buscarInmuebles(listId) {
                     err
                 });
             }
-            if (!inmuebleBD) {
+            console.log(inmuebleBD);
+            //Borrar esto
+            if (inmuebleBD.length === 0) {
                 // Recordar borrar del array si no existe
+                listId.splice(index, 1);
+                console.log(inmuebleBD);
             }
             // Ver si sigue solo
             // else {
@@ -159,19 +183,40 @@ function buscarInmueble(id) {
                 err
             });
         }
-        if (!inmuebleBD) {
-            return res.status(400).json({
-                ok: false,
-                message: 'Ese inmueble no existe',
-                err
-            });
+        if (inmuebleBD.length === 0) {
+            return false;
+        } else {
+            return true;
         }
     });
 }
 
+app.put('/usuario/blanquearClave/:id', [verificaToken, verificaAdminRole], (req, res) => {
+    const id = req.params.id;
+    const pwd = {
+        password: bcrypt.hashSync('Clave123', 10)
+    };
+    Usuario.findByIdAndUpdate(id, pwd, { new: true }, (err, usuarioActualizado) => {
+        if (err) return res.status(500).json({
+            ok: false,
+            err
+        });
+        if (!usuarioActualizado) res.status(400).json({
+            ok: false,
+            err: {
+                message: 'usuario no encontrado'
+            }
+        });
+        res.json({
+            ok: true,
+            usuario: usuarioActualizado
+        });
+    });
+});
+
 app.put('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
     let id = req.params.id;
-    let body = _.pick(req.body, ['nombre', 'apellido', 'img', 'role', 'estado', 'telefono1', 'telalternativo']);
+    let body = _.pick(req.body, ['nombre', 'apellido', 'role', 'estado', 'telefono1', 'telalternativo']);
 
     Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, usuarioBD) => {
         if (err) {
