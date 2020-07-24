@@ -46,12 +46,11 @@ let usuarioSchema = new Schema({
         //el rol debe existir en la enumeración
         enum: rolesValidos
     },
-    // inmueble: {
-    //     type: Array,
-    //     default: [],
-    //     // Puedo hacer que no sea obligatorio si lo hago vacío VER
-    //     required: true
-    // },
+    inmueble: {
+        type: Array,
+        default: []
+            // Puedo hacer que no sea obligatorio si lo hago vacío VER
+    },
     estado: {
         type: Boolean,
         default: true

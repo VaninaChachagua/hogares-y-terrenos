@@ -10,7 +10,7 @@ const { verificaToken, verificaMail, verificaAdminRole } = require('../middlewar
 const inmueble = require('../models/inmueble');
 
 app.get('/usuario', verificaToken, (req, res) => {
-    Usuario.find({ estado: true }, 'nombre apellido email telefono1 telalternativo role estado img') //Lo que yo quiero que busque
+    Usuario.find({ estado: true }, 'nombre apellido email telefono1 telalternativo role estado img inmueble') //Lo que yo quiero que busque
         .exec((err, usuarios) => {
             if (err) {
                 return res.status(400).json({
@@ -18,6 +18,24 @@ app.get('/usuario', verificaToken, (req, res) => {
                     err
                 });
             }
+            if (usuarios.length === 0) {
+                return res.status(404).json({
+                    ok: false,
+                    message: 'No existen usuarios para mostrar'
+                });
+            }
+            if (usuarios.inmueble && usuarios.inmueble.length > 0)
+                usuarios.inmueble.forEach((inm, index) => {
+                    Inmueble.findById(inm).exec((err, inmuebles) => {
+                        if (err) {
+                            return res.status(400).json({
+                                ok: false,
+                                err
+                            });
+                        }
+                        if (!inmuebles[0].disponible) usuarios.inmueble.splice(index, 1);
+                    });
+                });
             Usuario.count({ estado: true }, (err, conteo) => {
                 res.json({
                     ok: true,
@@ -75,23 +93,11 @@ app.get('/usuarioid/:id', (req, res) => {
 });
 
 
-app.put('/usuarioInmueble/:id', [verificaToken, verificaAdminRole], (req, res) => {
+app.put('/usuarioInmueble/:id', [verificaToken], (req, res) => {
+    console.log('UsuarioInmueble');
     let id = req.params.id;
-    // let body = _.pick(req.body, ['nombre', 'apellido', 'img', 'role', 'estado', 'telefono1', 'telalternativo']);
-    let inmueble = req.body;
-    if (!inmueble.length) {
-        buscarInmueble(inmueble);
-    } else {
-        let valor = buscarInmuebles(inmueble);
-        if (!valor) {
-            return res.status(404).json({
-                ok: false,
-                message: 'No se encontró el inmueble seleccionado',
-                error
-            });
-        }
-    }
-
+    let inmueble = req.body.inmuebles;
+    console.log(req.body.inmuebles);
     Usuario.findById(id, (err, usuarioBD) => {
         if (err) {
             return res.status(400).json({
@@ -99,7 +105,7 @@ app.put('/usuarioInmueble/:id', [verificaToken, verificaAdminRole], (req, res) =
                 err
             });
         }
-        console.log(err);
+        usuarioBD.inmueble = inmueble;
         usuarioBD.save((error, inmuebleGuardado) => {
             if (error) {
                 return res.status(500).json({
@@ -149,48 +155,6 @@ app.post('/usuario', [verificaMail], (req, res) => {
 });
 
 
-
-function buscarInmuebles(listId) {
-    listId.forEach((id, index) => {
-        Inmueble.findById(id, (err, inmuebleBD) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
-            }
-            console.log(inmuebleBD);
-            //Borrar esto
-            if (inmuebleBD.length === 0) {
-                // Recordar borrar del array si no existe
-                listId.splice(index, 1);
-                console.log(inmuebleBD);
-            }
-            // Ver si sigue solo
-            // else {
-            //     next();
-            // }
-
-        });
-    });
-}
-
-function buscarInmueble(id) {
-    Inmueble.findById(id, (err, inmuebleBD) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-        if (inmuebleBD.length === 0) {
-            return false;
-        } else {
-            return true;
-        }
-    });
-}
-
 app.put('/usuario/blanquearClave/:id', [verificaToken, verificaAdminRole], (req, res) => {
     const id = req.params.id;
     const pwd = {
@@ -225,7 +189,7 @@ app.put('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
                 err
             });
         }
-        console.log(err);
+
         res.json({
             ok: true,
             usuario: usuarioBD

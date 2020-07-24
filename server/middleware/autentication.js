@@ -7,7 +7,6 @@ const Usuario = require('../models/usuario');
 //next continua con la ejecución del programa
 let verificaToken = (req, res, next) => {
     let token = req.get('token');
-    console.log(token);
     jwt.verify(token, process.env.SEED, (err, decoded) => {
         if (err) {
             return res.status(401).json({
@@ -30,7 +29,6 @@ let verificaToken = (req, res, next) => {
 let verificaAdminRole = (req, res, next) => {
 
     let usuario = req.usuario.role;
-    console.log(usuario);
     if (usuario === 'ADMIN_ROLE') {
         next();
 
@@ -61,7 +59,6 @@ let verificaMail = (req, res, next) => {
                     err
                 });
             }
-            console.log(usuarios);
             if (usuarios) {
                 res.status(400).json({
                     ok: false,

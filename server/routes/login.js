@@ -50,7 +50,6 @@ app.post('/login', (req, res) => {
 // Obtener id también
 app.get('/obtenerInfoPorTk/:tk', (req, res) => {
     const tk = req.params.tk;
-    console.log('Llamadas a servicio');
     jwt.verify(tk, process.env.SEED, (err, decoded) => {
         if (err) {
             res.status(401).json({
