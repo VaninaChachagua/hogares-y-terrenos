@@ -29,10 +29,8 @@ app.use(express.static(path.resolve(__dirname, '../uploads/archivos')));
 
 //Configuración de rutas
 app.use(require('./routes/index'));
-//Ruta genérica
-express.Router().get('/login', (req, res) => { res.redirect('/login'); });
-express.Router().get('/home', (req, res) => { res.redirect('/home'); });
-express.Router().get('*', (req, res) => { res.redirect('/'); });
+
+
 
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
     .then(console.log('Base de datos ONLINE'))
