@@ -7,6 +7,9 @@ process.env.PORT = process.env.PORT || 3000;
 // *** Entorno ***//
 //******************************
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
+app.listen(PORT, () => {
+    console.log(`Our app is running on port ${ PORT }`);
+});
 
 //******************************
 //      Base de datos
