@@ -30,8 +30,8 @@ app.use(express.static(path.resolve(__dirname, '../uploads/archivos')));
 //Configuración de rutas
 app.use(require('./routes/index'));
 
-app.use('/login', express.static('./public'));
-app.use('/home', express.static('./public'));
+// app.use('/login', express.static('./public'));
+// app.use('/home', express.static('./public'));
 
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
     .then(console.log('Base de datos ONLINE'))
