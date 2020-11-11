@@ -14,7 +14,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 let urlDB;
 if (process.env.NODE_ENV === 'dev') {
     //BD local
-    urlDB = 'mongodb://localhost:27017/inmuebles';
+    // urlDB = 'mongodb://localhost:27017/inmuebles';
 
 } else {
     //BD nube
