@@ -17,6 +17,7 @@ if (process.env.NODE_ENV === 'dev') {
     // urlDB = 'mongodb://localhost:27017/inmuebles';
 
 } else {
+
     //BD nube
     urlDB = process.env.MONGO_URI;
 }
