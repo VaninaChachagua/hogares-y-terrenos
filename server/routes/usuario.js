@@ -86,7 +86,8 @@ app.get('/usuarioid/:id', (req, res) => {
             }
             res.json({
                 ok: true,
-                usuarioBD
+                usuarioBD,
+                inmueble: usuarioBD.inmueble
             });
         });
 
@@ -178,7 +179,7 @@ app.put('/usuario/blanquearClave/:id', [verificaToken, verificaAdminRole], (req,
     });
 });
 
-app.put('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
+app.put('/usuario/:id', [verificaToken], (req, res) => {
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'apellido', 'role', 'estado', 'telefono1', 'telalternativo']);
 

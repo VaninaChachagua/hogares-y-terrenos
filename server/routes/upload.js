@@ -38,6 +38,9 @@ app.put('/upload/:tipo/:id', (req, res) => {
     }
     // el nombre con el que voy a hacer el post en el body
     let archivos = req.files.archivo;
+    console.log(archivos);
+    if (typeof archivos === 'string') archivos = [archivos];
+    console.log(archivos);
     archivos.forEach(archivo => {
         //Extensiones permitidas
         let extensionesValidas = ['png', 'jpg', 'gif', 'jpeg'];
